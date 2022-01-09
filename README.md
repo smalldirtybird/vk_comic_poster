@@ -3,6 +3,7 @@
 Post comics to the wall of VK public page automatically!
  
 ## How to prepare:
+
 1. Make sure Python installed on your PC - you can get it from [official website](https://www.python.org/).
    
 
@@ -15,24 +16,27 @@ Post comics to the wall of VK public page automatically!
    Skip this step if the group has already been created.
    
 4. Find out the group ID using a [special service](https://regvk.com/id/).
-   Create .env file in directory with main.py file(use Notepad++) and add the string
+   Create **.env** file in directory with **main.py** file (use Notepad++) and add the string
     ```
     VK_GROUP_ID='your_group_id'
     ```
-    to it instead of value in quotes. Here and further quotes must be removed.
+    with group ID instead of value in quotes. Here and further quotes must be removed.
    
-5. Create an application on the [VK page for developers](https://vk.com/dev) using the "My Apps" button at the top of the page.
-   Select the "standalone" application type.
+5. Create an application on the [VK page for developers](https://vk.com/dev) using the **"My Apps"** button at the top of the page.
+   Select the `standalone` application type.
    
-6. On the [My Apps page](https://vk.com/apps?act=manage), click the "Manage" button and copy the application ID from the address bar.
-   Save the ID in the .en file on a separate line.
+6. On the [My Apps page](https://vk.com/apps?act=manage), click the **"Manage"** button and copy the application ID from the address bar.
+   Save the ID in the **.env** file on a separate line like
+   ```
+   VK_APP_CLIENT_ID='application_id'
+   ```
    
 7. Following the [instructions on Implict Flow](https://vk.com/dev/implicit_flow_user), get an access_token to access the VK API.
    Set the scope parameter as follows:
    ```scope = photos, groups, wall, offline```.
    The `redirect_uri` parameter should be removed from the request.
    As a result, you will get an `access_token` looks like `533bacf**********06a3` in the browser address bar.
-   Add it to your .env file as a line:
+   Add it to your **.env** file as a line:
    ```
    VK_ACCESS_TOKEN='your_access_token'
    ```
