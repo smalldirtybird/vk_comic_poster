@@ -4,8 +4,6 @@ from dotenv import load_dotenv
 import os
 import urllib
 import random
-import shutil
-from pprint import pprint
 
 
 def get_random_comic_url():
@@ -134,4 +132,4 @@ if __name__ == '__main__':
     owner_id, media_id = save_wall_photo(parameters, uploaded_photo_parameters)
     comic_post_result = wall_post_comics(parameters, owner_id, media_id, comic_comment)
     print(comic_post_result)
-    shutil.rmtree(comic_folder)
+    os.remove(comic_path)
