@@ -6,19 +6,20 @@ import urllib
 import random
 
 
-def get_random_comic_url():
+def get_random_comic_number():
     current_comic_url = 'https://xkcd.com/info.0.json'
     response = requests.get(current_comic_url)
     response.raise_for_status()
     current_comic_number = response.json()['num']
-    random_comic_number = random.choice(range(1, current_comic_number + 1))
-    return f'https://xkcd.com/{random_comic_number}/info.0.json'
+    return random.choice(range(1, current_comic_number + 1))
 
 
-def get_comic_with_comment(url):
+def get_comic_with_comment(number):
+    url = f'https://xkcd.com/{number}/info.0.json'
     response = requests.get(url)
     response.raise_for_status()
-    return response.json()['img'], response.json()['alt']
+    comic = response.json()
+    return comic['img'], comic['alt']
 
 
 def get_image_extension(url):
@@ -123,9 +124,9 @@ if __name__ == '__main__':
         'group_id': vk_group_id
         }
     comic_folder = get_arguments()
-    comic_url = get_random_comic_url()
+    comic_number = get_random_comic_number()
     comic_path, comic_comment = download_comic(
-        comic_url, comic_folder)
+        comic_number, comic_folder)
     photo_upload_url = get_photo_upload_url(parameters)
     uploaded_photo_parameters = upload_photo_to_server(
         photo_upload_url, comic_path)
