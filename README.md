@@ -1,6 +1,6 @@
 # VK comic poster
 
-Post comics to the wall of VK public page automatically!
+Post comics to the wall of [VK](https://vk.com/) public page automatically!
  
 ## How to prepare:
 
