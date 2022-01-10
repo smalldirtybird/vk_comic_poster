@@ -74,8 +74,8 @@ def save_wall_photo(params, photo_parameters):
     parameters.update(photo_parameters)
     response = requests.get(url, params=params)
     response.raise_for_status()
-    return response.json()['response'][0]['owner_id'],\
-        response.json()['response'][0]['id']
+    saved_photo_parameters = response.json()['response'][0]
+    return saved_photo_parameters['owner_id'], saved_photo_parameters['id']
 
 
 def wall_post_comics(params, media_owner_id, post_media_id, comment):
@@ -92,11 +92,10 @@ def wall_post_comics(params, media_owner_id, post_media_id, comment):
     response = requests.post(url, params=params)
     response.raise_for_status()
     if 'error' in response.json():
-        error_code = response.json()['error']['error_code']
-        error_message = response.json()['error']['error_msg']
+        error = response.json()['error']
         return f'''
-            Error code: {error_code}.
-            Error message: {error_message}.
+            Error code: {error['error_code']}.
+            Error message: {error['error_msg']}.
             Check VK API documentation: https://dev.vk.com/reference/errors.
             '''
     else:
