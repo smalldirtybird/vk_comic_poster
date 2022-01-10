@@ -11,7 +11,7 @@ def get_random_comic_number():
     response = requests.get(current_comic_url)
     response.raise_for_status()
     current_comic_number = response.json()['num']
-    return random.choice(range(1, current_comic_number + 1))
+    return random.randint(1, current_comic_number)
 
 
 def get_comic_with_comment(number):
