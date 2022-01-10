@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 import urllib
 import random
+from pprint import pprint
 
 
 def get_random_comic_number():
@@ -48,10 +49,15 @@ def download_comic(url, folder):
     return path, comment
 
 
-def get_photo_upload_url(params):
+def get_photo_upload_url(access_token, api_version, group_id):
     host = 'https://api.vk.com/method/'
     method = 'photos.getWallUploadServer'
     url = os.path.join(host, method)
+    params = {
+        'access_token': access_token,
+        'v': api_version,
+        'group_id': group_id
+        }
     response = requests.get(url, params=params)
     response.raise_for_status()
     return response.json()['response']['upload_url']
@@ -64,31 +70,48 @@ def upload_photo_to_server(url, filepath):
             }
         response = requests.post(url, files=image)
         response.raise_for_status()
-        return response.json()
+        uploaded_photo_parameters = response.json()
+        return uploaded_photo_parameters['hash'],\
+            uploaded_photo_parameters['photo'],\
+            uploaded_photo_parameters['server']
 
 
-def save_wall_photo(params, photo_parameters):
+def save_wall_photo(access_token, api_version, group_id,
+                    photo_hash, photo, photo_server):
     host = 'https://api.vk.com/method/'
     method = 'photos.saveWallPhoto'
     url = os.path.join(host, method)
-    parameters.update(photo_parameters)
+    params = {
+        'access_token': access_token,
+        'v': api_version,
+        'group_id': group_id,
+        'hash': photo_hash,
+        'photo': photo,
+        'server': photo_server
+        }
     response = requests.get(url, params=params)
     response.raise_for_status()
     saved_photo_parameters = response.json()['response'][0]
     return saved_photo_parameters['owner_id'], saved_photo_parameters['id']
 
 
-def wall_post_comics(params, media_owner_id, post_media_id, comment):
+def wall_post_comics(access_token, api_version, group_id,
+                     media_owner_id, post_media_id, comment):
     host = 'https://api.vk.com/method/'
     method = 'wall.post'
     url = os.path.join(host, method)
-    post_owner_id = f'-{params.pop("group_id")}'
+    post_owner_id = f'-{group_id}'
     post_from_group_checkbox = '1'
     post_attachment = f'photo{media_owner_id}_{post_media_id}'
-    params['owner_id'] = post_owner_id
-    params['from_group'] = post_from_group_checkbox
-    params['attachments'] = post_attachment
-    params['message'] = comment
+    params = {
+        'access_token': access_token,
+        'v': api_version,
+        'group_id': group_id,
+        'owner_id': post_owner_id,
+        'from_group': post_from_group_checkbox,
+        'attachments': post_attachment,
+        'message': comment
+    }
     response = requests.post(url, params=params)
     response.raise_for_status()
     if 'error' in response.json():
@@ -126,10 +149,15 @@ if __name__ == '__main__':
     comic_number = get_random_comic_number()
     comic_path, comic_comment = download_comic(
         comic_number, comic_folder)
-    photo_upload_url = get_photo_upload_url(parameters)
-    uploaded_photo_parameters = upload_photo_to_server(
-        photo_upload_url, comic_path)
-    owner_id, media_id = save_wall_photo(parameters, uploaded_photo_parameters)
-    comic_post_result = wall_post_comics(parameters, owner_id, media_id, comic_comment)
+    photo_upload_url = get_photo_upload_url(
+        vk_access_token, vk_api_version, vk_group_id)
+    uploaded_photo_hash, uploaded_photo, uploaded_photo_server = \
+        upload_photo_to_server(photo_upload_url, comic_path)
+    owner_id, media_id = save_wall_photo(vk_access_token, vk_api_version,
+                                         vk_group_id, uploaded_photo_hash,
+                                         uploaded_photo, uploaded_photo_server)
+    comic_post_result = wall_post_comics(vk_access_token, vk_api_version,
+                                         vk_group_id, owner_id,
+                                         media_id, comic_comment)
     print(comic_post_result)
     os.remove(comic_path)
