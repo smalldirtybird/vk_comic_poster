@@ -69,11 +69,11 @@ def upload_photo_to_server(url, filepath):
             'photo': file
             }
         response = requests.post(url, files=image)
-        response.raise_for_status()
-        uploaded_photo_parameters = response.json()
-        return uploaded_photo_parameters['hash'],\
-            uploaded_photo_parameters['photo'],\
-            uploaded_photo_parameters['server']
+    response.raise_for_status()
+    uploaded_photo_parameters = response.json()
+    return uploaded_photo_parameters['hash'],\
+        uploaded_photo_parameters['photo'],\
+        uploaded_photo_parameters['server']
 
 
 def save_wall_photo(access_token, api_version, group_id,
