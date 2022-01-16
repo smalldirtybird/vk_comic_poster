@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 import os
 import urllib
 import random
-from pprint import pprint
 
 
 class VkApiError(Exception):
@@ -150,11 +149,11 @@ if __name__ == '__main__':
     vk_access_token = os.environ['VK_ACCESS_TOKEN']
     vk_api_version = '5.131'
     vk_group_id = os.environ['VK_GROUP_ID']
-    comic_folder = get_arguments()
-    comic_number = get_random_comic_number()
-    comic_path, comic_comment = download_comic(
-        comic_number, comic_folder)
     try:
+        comic_folder = get_arguments()
+        comic_number = get_random_comic_number()
+        comic_path, comic_comment = download_comic(
+            comic_number, comic_folder)
         photo_upload_url = get_photo_upload_url(
             vk_access_token, vk_api_version, vk_group_id)
         uploaded_photo_hash, uploaded_photo, uploaded_photo_server = \
@@ -167,4 +166,5 @@ if __name__ == '__main__':
                          owner_id, media_id, comic_comment)
     except VkApiError as vk_error:
         print(vk_error)
-    os.remove(comic_path)
+    finally:
+        os.remove(comic_path)
