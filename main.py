@@ -7,6 +7,20 @@ import random
 from pprint import pprint
 
 
+class VkApiError(Exception):
+    pass
+
+
+def check_vk_api_error(response):
+    if 'error' in response:
+        error = response['error']
+        raise VkApiError(f'''
+            Error code: {error['error_code']}.
+            Error message: {error['error_msg']}.
+            Check VK API documentation: https://dev.vk.com/reference/errors.
+            ''')
+
+
 def get_random_comic_number():
     current_comic_url = 'https://xkcd.com/info.0.json'
     response = requests.get(current_comic_url)
@@ -59,8 +73,10 @@ def get_photo_upload_url(access_token, api_version, group_id):
         'group_id': group_id
         }
     response = requests.get(url, params=params)
+    parameters_for_upload = response.json()
+    check_vk_api_error(parameters_for_upload)
     response.raise_for_status()
-    return response.json()['response']['upload_url']
+    return parameters_for_upload['response']['upload_url']
 
 
 def upload_photo_to_server(url, filepath):
@@ -91,8 +107,10 @@ def save_wall_photo(access_token, api_version, group_id,
         }
     response = requests.get(url, params=params)
     response.raise_for_status()
-    saved_photo_parameters = response.json()['response'][0]
-    return saved_photo_parameters['owner_id'], saved_photo_parameters['id']
+    saved_photo_parameters = response.json()
+    check_vk_api_error(saved_photo_parameters)
+    return saved_photo_parameters['response'][0]['owner_id'],\
+        saved_photo_parameters['response'][0]['id']
 
 
 def wall_post_comics(access_token, api_version, group_id,
@@ -114,15 +132,7 @@ def wall_post_comics(access_token, api_version, group_id,
     }
     response = requests.post(url, params=params)
     response.raise_for_status()
-    if 'error' in response.json():
-        error = response.json()['error']
-        return f'''
-            Error code: {error['error_code']}.
-            Error message: {error['error_msg']}.
-            Check VK API documentation: https://dev.vk.com/reference/errors.
-            '''
-    else:
-        return 'Comic successfully published!'
+    check_vk_api_error(response.json())
 
 
 def get_arguments():
@@ -140,24 +150,21 @@ if __name__ == '__main__':
     vk_access_token = os.environ['VK_ACCESS_TOKEN']
     vk_api_version = '5.131'
     vk_group_id = os.environ['VK_GROUP_ID']
-    parameters = {
-        'access_token': vk_access_token,
-        'v': vk_api_version,
-        'group_id': vk_group_id
-        }
     comic_folder = get_arguments()
     comic_number = get_random_comic_number()
     comic_path, comic_comment = download_comic(
         comic_number, comic_folder)
-    photo_upload_url = get_photo_upload_url(
-        vk_access_token, vk_api_version, vk_group_id)
-    uploaded_photo_hash, uploaded_photo, uploaded_photo_server = \
-        upload_photo_to_server(photo_upload_url, comic_path)
-    owner_id, media_id = save_wall_photo(vk_access_token, vk_api_version,
-                                         vk_group_id, uploaded_photo_hash,
-                                         uploaded_photo, uploaded_photo_server)
-    comic_post_result = wall_post_comics(vk_access_token, vk_api_version,
-                                         vk_group_id, owner_id,
-                                         media_id, comic_comment)
-    print(comic_post_result)
+    try:
+        photo_upload_url = get_photo_upload_url(
+            vk_access_token, vk_api_version, vk_group_id)
+        uploaded_photo_hash, uploaded_photo, uploaded_photo_server = \
+            upload_photo_to_server(photo_upload_url, comic_path)
+        owner_id, media_id = save_wall_photo(vk_access_token, vk_api_version,
+                                             vk_group_id, uploaded_photo_hash,
+                                             uploaded_photo,
+                                             uploaded_photo_server)
+        wall_post_comics(vk_access_token, vk_api_version, vk_group_id,
+                         owner_id, media_id, comic_comment)
+    except VkApiError as vk_error:
+        print(vk_error)
     os.remove(comic_path)
