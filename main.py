@@ -4,7 +4,6 @@ import random
 import urllib
 
 import requests
-
 from dotenv import load_dotenv
 
 
@@ -15,11 +14,11 @@ class VkApiError(Exception):
 def check_vk_api_error(response):
     if 'error' in response:
         error = response['error']
-        raise VkApiError(f'''
+        raise VkApiError(f"""
             Error code: {error['error_code']}.
             Error message: {error['error_msg']}.
             Check VK API documentation: https://dev.vk.com/reference/errors.
-            ''')
+            """)
 
 
 def get_random_comic_number():
