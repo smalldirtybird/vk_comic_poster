@@ -1,9 +1,11 @@
 import argparse
-import requests
-from dotenv import load_dotenv
 import os
-import urllib
 import random
+import urllib
+
+import requests
+
+from dotenv import load_dotenv
 
 
 class VkApiError(Exception):
