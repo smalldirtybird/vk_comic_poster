@@ -51,8 +51,8 @@ def download_image(url, path, params=None):
         file.write(response.content)
 
 
-def download_comic(url, folder):
-    image_url, comment = get_comic_with_comment(url)
+def download_comic(number, folder):
+    image_url, comment = get_comic_with_comment(number)
     filename = 'comic'
     image_extension = get_image_extension(image_url)
     path = os.path.join(folder,
