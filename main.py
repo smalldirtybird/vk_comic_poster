@@ -112,8 +112,8 @@ def save_wall_photo(access_token, api_version, group_id,
         saved_photo_parameters['response'][0]['id']
 
 
-def wall_post_comics(access_token, api_version, group_id,
-                     media_owner_id, post_media_id, comment):
+def post_comics_on_wall(access_token, api_version, group_id,
+                        media_owner_id, post_media_id, comment):
     host = 'https://api.vk.com/method/'
     method = 'wall.post'
     url = os.path.join(host, method)
@@ -162,8 +162,8 @@ if __name__ == '__main__':
                                              vk_group_id, uploaded_photo_hash,
                                              uploaded_photo,
                                              uploaded_photo_server)
-        wall_post_comics(vk_access_token, vk_api_version, vk_group_id,
-                         owner_id, media_id, comic_comment)
+        post_comics_on_wall(vk_access_token, vk_api_version, vk_group_id,
+                            owner_id, media_id, comic_comment)
     except VkApiError as vk_error:
         print(vk_error)
     finally:
