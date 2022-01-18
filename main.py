@@ -72,9 +72,9 @@ def get_photo_upload_url(access_token, api_version, group_id):
         'group_id': group_id
         }
     response = requests.get(url, params=params)
+    response.raise_for_status()
     parameters_for_upload = response.json()
     check_vk_api_error(parameters_for_upload)
-    response.raise_for_status()
     return parameters_for_upload['response']['upload_url']
 
 
