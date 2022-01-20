@@ -21,12 +21,11 @@ def check_vk_api_error(response):
             """)
 
 
-def get_random_comic_number():
+def get_last_comic_number():
     last_comic_url = 'https://xkcd.com/info.0.json'
     response = requests.get(last_comic_url)
     response.raise_for_status()
-    last_comic_number = response.json()['num']
-    return random.randint(1, last_comic_number)
+    return response.json()['num']
 
 
 def get_comic_with_comment(number):
@@ -152,7 +151,8 @@ if __name__ == '__main__':
     vk_api_version = '5.131'
     vk_group_id = os.environ['VK_GROUP_ID']
     comic_folder = get_arguments()
-    comic_number = get_random_comic_number()
+    last_comic_number = get_last_comic_number()
+    comic_number = random.randint(1, last_comic_number)
     comic_path, comic_comment = download_comic(
         comic_number, comic_folder)
     try:
