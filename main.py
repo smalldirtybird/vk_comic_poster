@@ -22,11 +22,11 @@ def check_vk_api_error(response):
 
 
 def get_random_comic_number():
-    current_comic_url = 'https://xkcd.com/info.0.json'
-    response = requests.get(current_comic_url)
+    last_comic_url = 'https://xkcd.com/info.0.json'
+    response = requests.get(last_comic_url)
     response.raise_for_status()
-    current_comic_number = response.json()['num']
-    return random.randint(1, current_comic_number)
+    last_comic_number = response.json()['num']
+    return random.randint(1, last_comic_number)
 
 
 def get_comic_with_comment(number):
